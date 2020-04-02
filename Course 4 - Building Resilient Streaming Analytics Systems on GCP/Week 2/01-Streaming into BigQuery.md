@@ -15,7 +15,7 @@
 - Interactive SQL Queries over large datasets (petabytes) in seconds
 - Near real-time insights
 
-![Slide 1](imgs/bq_stream_1.jpeg)
+![Slide 1](imgs/streaming-into-bigquery/bq_stream_1.jpeg)
 
 - Streaming from BigQuery gives an Insert ID; as streaming is not a load job
 - Streaming inserts allow you to stream one item at a time into a table
@@ -83,7 +83,7 @@ errors = bigquery_client.insert_rows(table, rows_to_insert)
 
 ## Want to visualise insights? Explore Data Studio insights right from within BigQuery
 
-![slide 3](imgs/bq_stream_3.jpeg)
+![slide 3](imgs/streaming-into-bigquery/bq_stream_3.jpeg)
 
 - Next steps are to run SQL queries to analyse this data (see course 1)
 - One feature for visual exploration is trending now

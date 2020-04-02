@@ -29,7 +29,7 @@ We will look at:
 
 ## Cloud Bigtable
 
-![Slide 1](imgs/bt_stream_1.jpeg)
+![Slide 1](imgs/streaming-into-bigtable/bt_stream_1.jpeg)
 
 - Bigtable is for high performance applications
 - To use Bigtable effectively, you have to know a lot about your data and how it will be queried upfront
@@ -37,7 +37,7 @@ We will look at:
 
 ## How to choose between Cloud Bigtable and BigQuery
 
-![Slide 2](imgs/bt_stream_2.jpeg)
+![Slide 2](imgs/streaming-into-bigtable/bt_stream_2.jpeg)
 
 - Cloud Bigtable is ideal for applications that need very high throughput and scalability **for non-structured key-value data**
   - Where each value is typically no larger than 10 MB
@@ -51,7 +51,7 @@ We will look at:
 
 Here are a few examples of Data Engineering requirements that have been solved using Cloud Bigtable:
 
-![Slide 3](imgs/bt_stream_3.jpeg)
+![Slide 3](imgs/streaming-into-bigtable/bt_stream_3.jpeg)
 
 ### Example use-cases of Cloud Bigtable
 
@@ -69,7 +69,7 @@ Here are a few examples of Data Engineering requirements that have been solved u
 
 ## How does Cloud Bigtable work?
 
-![slide 4](imgs/bt_stream_4.jpeg)
+![slide 4](imgs/streaming-into-bigtable/bt_stream_4.jpeg)
 
 - Cloud Bigtable stores data in a filesystem called: Collossus
 - Collossus also contains data structures such as **tablets** that are used to identify and manage the data
@@ -115,7 +115,7 @@ Here are a few examples of Data Engineering requirements that have been solved u
 
 When the data and queries are the right match for Bigtable, Bigtable can be both consistently and extremely fast and efficient
 
-![slide 6](imgs/bt_stream_6.jpeg)
+![slide 6](imgs/streaming-into-bigtable/bt_stream_6.jpeg)
 
 ### Scanning
 
@@ -165,7 +165,7 @@ The following lessons can be learn from the previous section:
 
 Let us take an example to understand the Bigtable best design practices and implementation tips
 
-![slide 7](imgs/bt_stream_7.jpeg)
+![slide 7](imgs/streaming-into-bigtable/bt_stream_7.jpeg)
 
 We are considering flights data for all the airlines and flight routes operated on:
 
@@ -180,7 +180,7 @@ We are considering flights data for all the airlines and flight routes operated 
 
 In this example, the Row Key will be defined for the most common use-cases.
 
-![slide 8](imgs/bt_stream_8.jpeg)
+![slide 8](imgs/streaming-into-bigtable/bt_stream_8.jpeg)
 
 The query is to find all flights originating from the Atlanta airport, and arriving between March 21st and 29th.
 
@@ -210,7 +210,7 @@ Cloud Bigtable also provides column families. By accessing a column family, you 
 
 This makes access more efficient. For example, you may only need flight information most of the time and do not really care about aircraft details.
 
-![slide 9](imgs/bt_stream_9.jpeg)
+![slide 9](imgs/streaming-into-bigtable/bt_stream_9.jpeg)
 
 ### Queries that use the row key, a row prefix, or a row range are the most efficient
 
@@ -253,7 +253,7 @@ So far, we have discussed adding and querying the data. Now we will see how Bigt
 
 If you want to make a change to the data, a new row is appended sequentially to the end of the table and the previous version is marked for deletion. So both rows exist for a period of time.
 
-![slide10](imgs/bt_stream_10.jpeg)
+![slide10](imgs/streaming-into-bigtable/bt_stream_10.jpeg)
 
 Periodically, Cloud Bigtable compacts the table, removing rows marked for deletion and reorgansing the data for read and write efficiency.
 
@@ -265,7 +265,7 @@ However, choosing a Row Key that groups related rows so they're adjacent makes i
 
 In the airline example, if we were collecting weather data from the airport cities, we might construct a key consisting of a hash of the city name along with a timestamp (e.g. `CityName#TS`).
 
-![slide11](imgs/bt_stream_11.jpeg)
+![slide11](imgs/streaming-into-bigtable/bt_stream_11.jpeg)
 
 The example Row Key shown would enable pulling all the data for Delhi, India as a contiguous range of rows. Whenever there are rows containing multiple column values that are related, it is a good idea to group them into a column family.
 
@@ -283,11 +283,11 @@ Cloud Bigtable periodically rewrites your table to remove deleted entries, and t
 
 It tries to redistribute reads and writes equally across all Cloud Bigtable nodes.
 
-![slide12](imgs/bt_stream_12.jpeg)
+![slide12](imgs/streaming-into-bigtable/bt_stream_12.jpeg)
 
 In the example above, A, B, C, D and E are not data; but rather pointers or references and cache. This is why rebalancing is not time-consuming - we are just moving pointers. Actual data resides in tablets in the Colossus file system.
 
-![slide13](imgs/bt_stream_13.jpeg)
+![slide13](imgs/streaming-into-bigtable/bt_stream_13.jpeg)
 
 Based on the learned access patterns, Bigtable re-balances data accordingly, and balances the workload across nodes.
 
@@ -295,7 +295,7 @@ Based on the learned access patterns, Bigtable re-balances data accordingly, and
 
 With a well-designed schema, reads and writes should be distributed fairly evenly across an entire table and cluster.
 
-![slide14](imgs/bt_stream_14.jpeg)
+![slide14](imgs/streaming-into-bigtable/bt_stream_14.jpeg)
 
 However, it is inevitable that some data will be accessed more frequently than others. In these cases, Cloud Bigtable will redistribute tablets so that reads are spread across nodes in the cluster evenly.
 
