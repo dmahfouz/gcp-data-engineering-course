@@ -113,4 +113,3 @@ errors = bigquery_client.insert_rows(table, rows_to_insert)
   - Other people who view the report can potentially see all the data in that Data Source if you share that source with them
   - Anyone who can edit the report can use all the fields from any added data sources to create new charts with them
   - You can click 'Add to report' to add the data source and then you are ready to start visualising
- 
