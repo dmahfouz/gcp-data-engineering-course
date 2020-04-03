@@ -283,6 +283,7 @@ cd ~/training-data-analyst/courses/streaming/process/sandiego
 nano run_oncloud.sh
 ```
 
+-------------------------------
 #### `run_oncloud.sh` code
 
 <details><summary>Click to expand</summary>
@@ -317,6 +318,8 @@ mvn compile -e exec:java \
 
 </details>
 
+-------------------------------
+
 What does the script do?
 
 1. The script takes 3 required arguments: project id, bucket name, classname and possibly a 4th argument: options. In this part of the lab, we will use the `--bigtable` option which will direct the pipeline to write into Cloud Bigtable.
@@ -328,12 +331,15 @@ cd ~/training-data-analyst/courses/streaming/process/sandiego
 
 ./create_cbt.sh
 ```
+-------------------------------
 
 #### `./create_cbt.sh` code
 
 ```sh
 gcloud beta bigtable instances create sandiego --cluster=cpb210 --cluster-zone=us-central1-b --display-name=="San Diego Freeway data" --instance-type=DEVELOPMENT
 ```
+
+-------------------------------
 
 1. Run the Dataflow pipeline to read from PubSub and write into Cloud Bigtable.
 
@@ -380,7 +386,9 @@ cd ~/training-data-analyst/courses/streaming/process/sandiego/quickstart
 ./quickstart.sh
 
 ```
+
 -------------------------------
+
 >#### `./quickstart.sh` code
 <details><summary>Click to expand</summary>
 
