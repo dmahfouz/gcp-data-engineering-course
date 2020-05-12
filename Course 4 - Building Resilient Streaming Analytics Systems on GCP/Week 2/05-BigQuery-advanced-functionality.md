@@ -132,26 +132,69 @@ Note: It can be seen that the data is being pulled from a staging place noted in
 
 ![viz](imgs/bigquery-advanced-func/viz.jfif)
 
-### Demo: GIS Functions and Mapping with BigQuery
+## Demo: GIS Functions and Mapping with BigQuery
 
-#### Takeaways
+### Takeaways
 
-##### Using `ST_DWITHIN` to check if two location objects are within some distance
+#### Using `ST_DWITHIN` to check if two location objects are within some distance
 
 ![st_within](imgs/bigquery-advanced-func/st_within.jfif)
 
-##### All longitude and latitude should be represented as Well Known Text (WKT) using the function `ST_GeogPoint`
+#### All longitude and latitude should be represented as Well Known Text (WKT) using the function `ST_GeogPoint`
 
 ![geogpnt](imgs/bigquery-advanced-func/geog.jfif)
 
-##### Distances and regions can be represented using `ST_MakeLine` and `ST_MakePolygon`
+#### Distances and regions can be represented using `ST_MakeLine` and `ST_MakePolygon`
 
 ![polygon](imgs/bigquery-advanced-func/polygon.jfif)
 
-##### Distances away from a central point can be estimated
+#### Distances away from a central point can be estimated using `ST_Within`
 
 ![radius](imgs/bigquery-advanced-func/radius.jfif)
 
-##### Advanced GIS predicate functions
+#### Advanced GIS predicate functions (such as `ST_Intersects`, `ST_Contains`, `ST_CoveredBy`)
 
 ![pred-fns](imgs/bigquery-advanced-func/gis-fns.jfif)
+
+## `WITH` Clauses vs. Permanent Tables
+
+- Using a `WITH` clause is a great way to help break apart a complex query
+- But you can also create a series of new tables if you wanted to
+- Here we will evaluate the pros and cons of each approach
+
+### Use `WITH` clauses to stage complex analysis
+
+- When data is being preprocessed, we can wrap the entire query with a `WITH` clause, a name and then some parentheses
+- `WITH` clause queries are essentially named sub-queries, which means you could paste the entire query inside of this into a `FROM` clause in another query
+- However, this wouldn't be very readable and would be hard to understand than breaking it up using a `WITH` clause
+- `WITH` queries can be edited and changed multiple times and work well as a staging area for later queries
+- You can also have more than one named sub-query by simply chaining them together with a comma
+
+![with-qry](imgs/bigquery-advanced-func/with_qry.jfif)
+
+#### Should we replace `WITH` queries with just a `CREATE OR REPLACE TABLE AS` query?
+
+- Preprocessing query data *could* be stored in a new table
+- Storing in a new table will be much faster to query later, as the pre-processing and joins are done, and could even be shared with others
+- The drawbacks of this approach is that if users only ever needed a subset of that data, i.e. they're continuously adding `WHERE` clauses, it may be much faster just to use the `WITH` clause
+- This is because, even if the `WITH` clause doesn't have a `WHERE` filter that the user may specify later, BigQuery is smart enough to do what's called **predicate push-down** and do the filter first as part of the `WITH` statement even if it wasn't specified when originally created
+- Lastly, if you are continuously modifying the preprocessing steps on the data, then a `WITH` query can be edited whereas a table will need to be dropped and recreated
+- Choosing between `WITH` and `CREATE OR REPLACE TABLE AS` comes down to using your own judgement and depend on the situation
+- One strategy: might be to start with a lot of `WITH` clauses and then promote them over time to permanent tables as each use case demand
+
+#### Summary
+
+- Choosing between `WITH` and `CREATE OR REPLACE TABLE AS`
+- Permanent tables PROs:
+  - **Speed** - preprocess the data once
+  - **Shared insight** - let others access and query your data
+- Permanent tables CONs:
+  - **May process more data than you need** (can't do predicate pushdown)
+  - **Readability** - it's not always clear what preprocessing steps were taken
+
+#### Exercise: Practice reading multiple `WITH` statements
+
+Goto: https://github.com/GoogleCloudPlatform/training-data-analyst/blob/master/courses/data-engineering/demos/advanced_sql_functions.md#analyzing-bike-turnover-working-with-window-functions
+
+- Practice reading the query
+- Look at parts of the query that are pulled from `WITH` clauses or named sub-queries
