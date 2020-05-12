@@ -1,8 +1,6 @@
 # BigQuery: Advanced functionality (and performance)
 
-## GIS Functions
-
-### Agenda
+## Agenda
 
 - GIS (Geographic Information System) Functions
   - Analyse 3 key questions to answer for geospatial analysis and look/use GIS functions to help solve and map the results with BigQuery GeoViz
@@ -14,6 +12,8 @@
   - Ranking functions and repeated data / array data types
 - Performance Considerations
   - Performance best practices to help govern data engineering and analysis
+
+## GIS Functions
 
 ### Case Study: London Bike Share dataset
 
@@ -53,7 +53,7 @@ Steps:
 
 ![schema-duration](imgs/bigquery-advanced-func/gis-duration.jfif)
 
-##### How can we calculate the distance (in Km) between the two stations?
+##### How can we calculate the distance (in Km) between the two stations
 
 - The `cycle_hire` table only contains start and end stations names (`start_station_name` and `end_station_name` respectively)
 
@@ -131,3 +131,27 @@ Note: It can be seen that the data is being pulled from a staging place noted in
 #### Visualisaing the fastest bike commuter station pairs with BigQuery GeoViz
 
 ![viz](imgs/bigquery-advanced-func/viz.jfif)
+
+### Demo: GIS Functions and Mapping with BigQuery
+
+#### Takeaways
+
+##### Using `ST_DWITHIN` to check if two location objects are within some distance
+
+![st_within](imgs/bigquery-advanced-func/st_within.jfif)
+
+##### All longitude and latitude should be represented as Well Known Text (WKT) using the function `ST_GeogPoint`
+
+![geogpnt](imgs/bigquery-advanced-func/geog.jfif)
+
+##### Distances and regions can be represented using `ST_MakeLine` and `ST_MakePolygon`
+
+![polygon](imgs/bigquery-advanced-func/polygon.jfif)
+
+##### Distances away from a central point can be estimated
+
+![radius](imgs/bigquery-advanced-func/radius.jfif)
+
+##### Advanced GIS predicate functions
+
+![pred-fns](imgs/bigquery-advanced-func/gis-fns.jfif)
