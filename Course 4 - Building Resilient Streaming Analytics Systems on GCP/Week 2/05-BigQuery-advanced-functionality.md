@@ -2,15 +2,15 @@
 
 ## Agenda
 
-- GIS (Geographic Information System) Functions
+- **GIS (Geographic Information System) Functions**
   - Analyse 3 key questions to answer for geospatial analysis and look/use GIS functions to help solve and map the results with BigQuery GeoViz
-- `WITH` Clauses vs. Permanent Tables
+- **`WITH` Clauses vs. Permanent Tables**
   - Explore `WITH` clauses vs. permanent tables for performance and readability
-- Analytical window(ing) functions
+- **Analytical window(ing) functions**
   - Use of analytical window functions, that allow you to break up a given dataset and perform SQL over certain windows of data
-- Ranking functions + `ARRAY`s
+- **Ranking functions + `ARRAY`s**
   - Ranking functions and repeated data / array data types
-- Performance Considerations
+- **Performance Considerations**
   - Performance best practices to help govern data engineering and analysis
 
 ## GIS Functions
