@@ -43,7 +43,7 @@ Steps:
 - Want to calculate speed = distance / time
 - Looking at the raw data, how do we calculate how fast a bike moves between stations?
 
-![preview-table](imgs/bigquery-advanced-func/gis-func-preview.jfif)
+![preview-table](./imgs/bigquery-advanced-func/gis-func-preview.jfif)
 
 ##### We can use duration (seconds) to get total travel time between stations
 
@@ -51,7 +51,7 @@ Steps:
 - If we click into the schema tab, we can see in the 'Description' column that the duration is the duration of the bike trip in **seconds**
 - Remember this is why it's critical when you're creating your own datasets to add in column descriptions
 
-![schema-duration](imgs/bigquery-advanced-func/gis-duration.jfif)
+![schema-duration](./imgs/bigquery-advanced-func/gis-duration.jfif)
 
 ##### How can we calculate the distance (in Km) between the two stations
 
@@ -198,3 +198,189 @@ Goto: https://github.com/GoogleCloudPlatform/training-data-analyst/blob/master/c
 
 - Practice reading the query
 - Look at parts of the query that are pulled from `WITH` clauses or named sub-queries
+
+## Analytical window functions
+
+### 2) Find the stations with the fastest and slowest turnover times
+
+Recap:
+
+1. *Finding the fastest bike share commuters in London (avg kmph between stations)*
+2. **Find the stations with the fastest and slowest turnover times**
+3. *Rank which bikes need maintenance the most based on usage metrics*
+
+### Reviewing our overall analysis approach
+
+**Goal**: Stations with the fastest and slowest bike turnover times
+
+#### Analyze the schema
+
+1. `cycle_hire` has `start_date` and `end_date` for each bike (timestamp)
+2. `cycle_hire` has the starting and ending bike station ids
+3. `cycle_station` has the count of total bike docks available (capacity)
+
+#### Plan the query
+
+1. `JOIN` the two datasets
+2. Track the previous time a given `bike_id` was returned before it was checked out again
+3. Calculate the timestamp difference between last return and this checkout
+4. Aggregate by each station
+5. Filter the data as necessary to remove anomalies
+
+#### Using `LAG` and `LEAD` functions to get previous timestamp
+
+![lag-lead](./imgs/bigquery-advanced-func/lag-lead.jfif)
+
+- The slide below visually shows what the `LAG` function is doing; the last end date is taken from the previous end date from the record before
+- By default, lag just looks back one record, but you can look deeper if you want to offset more
+
+![lag](./imgs/bigquery-advanced-func/lag.jfif)
+
+- The critical part of the query is the window function that we put with the lag
+- The `..OVER( PARTITION BY bike_id ORDER BY start_date )` ensures that we're only taking the lag within all the same bike IDs
+- In the example below, we can see that this is what it is doing - performing the lag for bike ID 9842 and then sorting the window of data from oldest to newest
+- This allows us to transverse the past rentals accurately
+
+![partition](./imgs/bigquery-advanced-func/partition.jfif)
+
+- Lastly we take a simple timestamp diff between the current rental start time, and the last rentals end time, which gives us the time in hours that the bike was idle in that dock
+- We can then aggregate with an average and show that result for each station name
+
+![diff](./imgs/bigquery-advanced-func/diff.jfif)
+
+- One additional thing you could try is filtering the dataset for only daytime hours or nighttime hours to see how time of day affects each station
+
+## Ranking functions and `ARRAY`s
+
+### 3) Rank which bikes need maintenance the most based on usage metrics
+
+1. *Finding the fastest bike share commuters in London (avg kmph between stations)*
+2. *Find the stations with the fastest and slowest turnover times*
+3. **Rank which bikes need maintenance the most based on usage metrics**
+
+Our last goal is to rank which bikes need maintenance based on the most usage metrics (that we're going to create)
+
+- For the first part of the query, let's get granualr information on each trip taken by giving each bike a rank
+- So for the first trip we give rank 1, for the second rank 2, etc..
+- Then let's sum common metrics for duration and distance
+- Finally we store all these metrics, new convenient structs that we call stats
+
+![rank](./imgs/bigquery-advanced-func/rank.jfif)
+
+- We then get the following results:
+
+![rolling-window-results](./imgs/bigquery-advanced-func/rolling-window.jfif)
+
+- What if we wanted to rank each bike against all other bikes
+- This would mean, for example, one record for bike 12757 which is ranked number one is distance travelled over 5000km
+- But we also want a repeated value for every trip that that bike took
+- If you wanted to drill down into that data, the secret to that is the `ARRAY` data type
+
+![array-challenge](./imgs/bigquery-advanced-func/array-challenge.jfif)
+
+### Demo - Ranking Bike Maintenance: Working with window functions and `ARRAY`s
+
+- This time we're looking at individual bike IDs and ranking them in accordance to the problem of solving which bikes need to be maintained the most based on how many hours the bike is ridden; how much distance is actually travelled
+- We're going to be doing that with window functions like logical partitions (not column partitions) and then `ARRAY`s with different levels of granularity in a given dataset
+
+#### Query
+
+```sql
+-- start with staging query
+WITH staging AS (
+  SELECT
+    --put starting and ending stations inside of their own STRUCTs
+    STRUCT(
+      start_stn.name,
+      ST_GEOGPOINT(start_stn.longitude, start_stn.latitude) AS point,
+      start_stn.docks_count,
+      start_stn.install_date
+    ) AS starting,
+    STRUCT(
+      end_stn.name,
+      ST_GEOGPOINT(end_stn.longitude, end_stn.latitude) AS point,
+      end_stn.docks_count,
+      end_stn.install_date
+    ) AS ending,
+    -- put all transactional info about rental in another STRUCT
+    STRUCT(
+      rental_id,
+      bike_id,
+      duration, --seconds
+      ST_DISTANCE(
+        ST_GEOGPOINT(start_stn.longitude, start_stn.latitude),
+        ST_GEOGPOINT(end_stn.longitude, end_stn.latitude)
+      ) AS distance, --meters
+      ST_MAKELINE(
+        ST_GEOGPOINT(start_stn.longitude, start_stn.latitude),
+        ST_GEOGPOINT(end_stn.longitude, end_stn.latitude)
+      ) AS trip_line, -- stright line (for GeoViz)
+      start_date,
+      end_date
+    ) AS bike
+  FROM `bigquery-public-data.london_bicycles.cycle_stations` AS start_stn
+  LEFT JOIN `bigquery-public-data.london_bicycles.cycle_hire` AS b
+  ON start_stn.id = b.station_id
+  LEFT JOIN `bigquery-public-data.london_bicycles.cycle_stations`  AS end_stn
+  ON end_stn.id = b.end_station_id
+)
+
+-- Collect key maintenance stations for each bike on total usage
+, maintenance_stats AS ( -- another (chained) entry to WITH clause
+  SELECT
+    bike.bike_id,
+
+    STRUCT(
+
+      -- for a given bike id, give me every trip that bike has taken and order it
+
+      RANK() OVER(                    -- rank each trip
+        PARTITION BY bike.bike_id     -- for a bike id partition
+        ORDER BY bike.start_date      -- order by start_date
+      ) AS current_trip_number,       -- store as column current_trip_number
+
+      -- for a given bike id, give me the total trip duration
+
+      SUM(bike.duration/60/60) OVER(  -- sum trip duration in hrs
+        PARTITION BY bike.bike_id     -- for a bike id partition
+        ORDER BY bike.start_date      -- order by start_date
+      ) AS cumulative_duration_hr,    -- store as column cumulative_duration_hr
+
+      -- for a given bike id, give me the total trip distance
+
+      SUM(bike.distance/1000) OVER(   -- sum trip distance
+        PARTITION BY bike.bike_id     -- for a bike id partition
+        ORDER BY bike.start_date      -- order by start date
+      ) AS cumulative_distance_km,    -- as cumulative_distance_km
+
+      bike.start_date,
+      bike.end_date
+    ) AS stats
+  FROM staging
+)
+
+SELECT
+  -- High level summary
+  RANK() OVER(
+    ORDER BY MAX(stats.cumulative_distance_km) DESC
+  ) AS most_distance_km_rank,
+  bike_id,
+  MAX(stats.cumulative_distance_km) AS distance_travelled,
+  -- Detail within array (show 10 most recent rides)
+  ARRAY_AGG(stats ORDER BY stats.end_date DESC LIMIT 10) AS maint_stats -- ARRAY_AGG aggregates the stats calculated above into an ARRAY
+FROM maintenance_stats
+GROUP BY bike_id
+ORDER BY most_distance_km_rank LIMIT 10
+```
+
+#### Final results
+
+In the final results we can see that our data is in an ARRAY format, given multiple repeated rows per `most_distance_km_rank` and `bike_id`
+
+| Row | most_distance_km_rank | bike_id | distance_travelled | maint_stats.current_trip_number | maint_stats.cumulative_duration_hr | maint_stats.cumulative_distance_km | ... |
+|---|---|-------|-----------|------|-----------|----------|-----|
+| 1 | 1 | 12757 | 5837.8218 | 2743 | 964.91666 | 5837.821 | ... |
+|   |   |       |           | 2742 | 964.76666 | 5835.773 | ... |
+|   |   |       |           | 2741 | 964.59999 | 5833.881 | ... |
+|   |   |       |           | 2740 | 964.49999 | 5833.039 | ... |
+|   |   |       |           | ...  | ...       | ...      | ... |
