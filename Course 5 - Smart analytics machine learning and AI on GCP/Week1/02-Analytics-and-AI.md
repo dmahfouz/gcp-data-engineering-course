@@ -64,5 +64,43 @@
 ![predict](./images/ml-predict.jfif)
 
 - After you train your model, you can then use it to predict the label of images that it has never seen before
+- After you train the model, you can then use it to predict the label of images that it has never seen before - learn from the past, predict the future
+- In this example, the input for the trained model is the image of a part
+- Because the model has already been trained it's able to correctly predict whether the part is in good condition
+- Note that the image here does not belong to the images from the training examples
+- The ML model is able to correctly predict the image because it is able to generalise well to ***unseen*** data - this shows that it hasn't memorised the training data with which it was given
+- It's learned a more general idea of *what a good looking part or a part in good condition looks like*
 
+### Standard use cases
 
+1. Detect a pattern in an image (image classification)
+2. Predict the future of a time series (regression)
+3. Understand or transcribe human speech or text (speech recognition/NLP)
+
+So why do we say these algorithms are standard?
+
+- Well, these algorithms exist independently of your use case
+- Even though detecting manufacturing defects and parts in those images and detecting something like diseased leaves on tree images are two very different use-cases, the same algorithm - **image classification network** works for both
+- Similarly, there are standard algorithms for predicting the future value of a time series dataset (regression) or to transcribe human speech to text (speech recognition/NLP)
+
+### A standard algorithm for image classification
+
+![resnet](./images/resnet.jfif)
+
+- ResNet is a standard algorithm for image classification
+- It *may not be crucial* to understand how an image classification algorithm (such as ResNet) works, *only that* it's the algorithm that you should use if you need to classify images of automotive parts
+- When you use the same algorithm on different datasets there are different features or inputs relative to the different use-cases, which can be seen visually below:
+
+![features](./images/features.jfif)
+
+- You may wonder, isn't the logic different -- you can't possibly use the same rules for identifying defects in manufacturing that you do in identifying different types of leaves
+
+![model-diff](./images/model-diff.jfif)
+
+- And you're right, the logic is different, but ML does not use logical if-then rules
+- The image classification network isn't like that set of rules *if this, then that* but a function that learns how to distinguish between categories of images
+- Even though we start with the same standard algorithm, after training any model on data for a specific use-case, it is now the *trained* model that works specifically for that use-case
+- It is even possible to reuse the same code for the other use-cases focussed on the same kind of task
+- So in our example, when identifying manufacturing defects, the higher level task is **classifying images**
+- You *can* reuse the same code for another image classification problem like find examples of your products in photos posted on social media, *but* you will still have to train it separately for each use-case
+- The main thing to know is **your ML model will only be *as good* as your data**
