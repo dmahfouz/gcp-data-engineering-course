@@ -301,7 +301,7 @@ We mentioned that Kubeflow pipelines can be packaged and shared with other users
   - Services
   - VM images
 
-### What a typical asset looks like?
+### What a typical asset looks like
 
 Here you see what a typical asset looks like. You can see information about the pipeline such as inputs and outputs and download options.
 
@@ -311,3 +311,14 @@ Here you see what a typical asset looks like. You can see information about the 
 
 - Public assets are available to all AI Hub users.
 - Restricted scope assets contain AI components you have uploaded and those that have been shared with you. For example, you could have assets only available to people within your organization or team.
+
+## Summary
+
+- Use ML on GCP using either
+  - AI Platform (your model, your data)
+  - AutoML (our models, your data)
+  - Perception API (our models, our data)
+- Use Kubeflow to deploy end-to-end ML pipelines
+- Don't reinvent the wheel for your ML pipeline!
+
+GCP has several options to suit your machine-learning needs.  Depending on the time and resources you have available, you have the option to use the AI platform, Auto ML or Perception APIs. You can use Kubeflow to deploy end-to-end ML pipelines and remember, don't reinvent the wheel for your ML pipeline! Instead, leverage available pipelines on AI Hub
