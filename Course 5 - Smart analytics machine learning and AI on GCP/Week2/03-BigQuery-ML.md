@@ -71,7 +71,7 @@ Let's look at the syntax needed to create a model:
 
 ### Evaluate model
 
-![eval-model](./imgs/eval-model.png)
+![eval-model](./imgs/eval-model.PNG)
 
 - Once we have a trained model, we want to know how it performs
 - Since it's a classification model, we can use a variety of metrics to see how well it knew where the article originated based on just the title
@@ -111,7 +111,7 @@ Let's look at the syntax needed to create a model:
 
 First, we have another example of linear classification, or, what is also known as logistic regression
 
-![logreg](./imgs/logreg.png)
+![logreg](./imgs/logreg.PNG)
 
 In this example, we're using a flights arrivals dataset to predict whether a flight would be on time or not, which is a binary outcome.
 
@@ -121,7 +121,7 @@ For more advanced users, there are other options such as if you want your model 
 
 #### Deep Neural Network (DNN) Classifier (alpha)
 
-![dnn](./imgs/dnn.png)
+![dnn](./imgs/dnn.PNG)
 
 While logistic regression models are the "Swiss-army knife" of machine learning, DNN's allow you to better model nonlinear relationships in your data.
 
@@ -133,7 +133,7 @@ The slide above shows how to do that for the same flight arrival time example us
 
 #### XGBoost Classifier (alpha)
 
-![xgboost](./imgs/xgboost.png)
+![xgboost](./imgs/xgboost.PNG)
 
 If you're familiar with gradient boosted trees and XGBoost, you can use this algorithm to train models in BQML
 
@@ -173,7 +173,7 @@ Just specify you want to use a boosted tree regressor
 
 What if you have already trained a model on Tensorflow? You can improt your saved model into BigQuery to serve batch predictions.
 
-![tf-bq](./imgs/tf.png)
+![tf-bq](./imgs/tf.PNG)
 
 In this example, the first statement is where we load our model into BQ.
 
@@ -189,7 +189,7 @@ We can also serve recommendations to users in BQML.
 
 #### Recommendation engine (matrix factorisation) (alpha)
 
-![matrix-factorisation](./imgs/rec-mf.png)
+![matrix-factorisation](./imgs/rec-mf.PNG)
 
 - The type of model being used for this is called a matrix factorisation model.
 - In short, matrix factorisation models are a form of collaborative filtering algorithm used in recommended systems.
@@ -202,7 +202,7 @@ We can also serve recommendations to users in BQML.
 - To build a recommendation engine in BQML, you must set the model type to matrix factorisation and provide a table of user-item interations
 - Once we have a trained recommender model, we can use it to serve recommendations
 
-![recommender-serve](./imgs/recommender-serve.png)
+![recommender-serve](./imgs/recommender-serve.PNG)
 
 - Above is an example query where we're getting our users and products with the query and getting the suggested products using the `ML.PREDICT` statement
 
@@ -224,7 +224,7 @@ Here are the model options available in BigQuery ML to explore our data using un
 
 We will dicuss the unsupervised machine learning algorithm, K-means clustering that's available in BQML.
 
-![k-means](./imgs/k-means.png)
+![k-means](./imgs/k-means.PNG)
 
 We won't go into the details of the algorithm, but, in short, when we do not have a label we are trying to predict, we can explore patterns in the data
 
@@ -232,19 +232,19 @@ In the example above, we cluster the data into 4 clusters, standardise the featu
 
 After we've trained a clustering model, we can easily see which cluster our data belongs to with a quick SQL query.
 
-![qry-clusters](./imgs/qry-clusters.png)
+![qry-clusters](./imgs/qry-clusters.PNG)
 
 - The centroid ID column refers to the cluster assigned to each row of data.
 - The data set used here is for a bike rental company that has stations spread out across London.
 - Once you have clusters, how do you actually get utility out of them? The key is to do some analysis on the data in each cluster.
 
-![cluster-attrs](./imgs/cluster-attrs.png)
+![cluster-attrs](./imgs/cluster-attrs.PNG)
 
 We can explore feature ranges and aggregate statistics to try to understad what is special about the individual clusters.
 
 For example, we could use Data Studio to visualise some of the attributes of the data in the clusters:
 
-![vis-attrs](./imgs/vis-attrs.png)
+![vis-attrs](./imgs/vis-attrs.PNG)
 
 Here we see that cluster one has the longest duration rights.
 
@@ -252,7 +252,7 @@ Here we see that cluster one has the longest duration rights.
 
 Using **`TRANSFORM`** ensures that the raw inputs expected from clients will be transformed to avoid training and serving skew at prediction time.
 
-![transform](./imgs/transform.png)
+![transform](./imgs/transform.PNG)
 
 On the left we see that the transformations are done in the query defining the training data set.
 
@@ -268,4 +268,4 @@ We've covered a lot of syntax in BQML, this includes syntax for training a model
 
 This cheat-sheet can be helpful for building models in BigQuery ML
 
-![bqml-cheatsheet](./imgs/bq-cheatsheet.png)
+![bqml-cheatsheet](./imgs/bq-cheatsheet.PNG)
